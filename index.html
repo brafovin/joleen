@@ -162,6 +162,24 @@
 
     .stars { color: var(--terracotta); letter-spacing: 2px; }
 
+    /* Echte Produktbilder füllen ihren Platzhalter-Rahmen */
+    .product-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: inherit;
+      display: block;
+    }
+    .has-img { color: transparent; }
+    .gallery-main { position: relative; }
+    .gallery-label {
+      position: absolute; inset: 0;
+      display: none;
+      align-items: center; justify-content: center;
+      color: var(--terracotta); font-size: 0.85rem; letter-spacing: 1px;
+    }
+    .gallery-main:not(.has-img) .gallery-label { display: flex; }
+
     /* ---------- SHOP HERO (Galerie + Kaufbox) ---------- */
     .shop {
       padding-top: 56px;
@@ -572,9 +590,12 @@
       <div class="shop-grid">
         <!-- Galerie -->
         <div class="gallery fade-in">
-          <div class="gallery-main placeholder" id="galleryMain">Produktbild 1 · 1:1</div>
+          <div class="gallery-main placeholder has-img" id="galleryMain">
+            <img class="product-img" id="galleryImg" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTLlbM0TbsD6OqjLMEeLpGJo7RHgswh1WYzvq4cVTqYNTe7JwJOMX7H_X_d2xBYNv0CBoW6WWmeZ-_X_X1iRKHhRlMtoxebpCuxieQb6JiHG_g-1jrgyAUAFg" alt="Bali Curls Bonding Oil 30 ml" />
+            <span class="gallery-label" id="galleryLabel"></span>
+          </div>
           <div class="gallery-thumbs">
-            <div class="thumb placeholder active" data-label="Produktbild 1 · 1:1">1</div>
+            <div class="thumb placeholder has-img active" data-label="Produktbild 1 · 1:1" data-img="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTLlbM0TbsD6OqjLMEeLpGJo7RHgswh1WYzvq4cVTqYNTe7JwJOMX7H_X_d2xBYNv0CBoW6WWmeZ-_X_X1iRKHhRlMtoxebpCuxieQb6JiHG_g-1jrgyAUAFg"><img class="product-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTLlbM0TbsD6OqjLMEeLpGJo7RHgswh1WYzvq4cVTqYNTe7JwJOMX7H_X_d2xBYNv0CBoW6WWmeZ-_X_X1iRKHhRlMtoxebpCuxieQb6JiHG_g-1jrgyAUAFg" alt="Bali Curls Bonding Oil" /></div>
             <div class="thumb placeholder" data-label="Produktbild 2 · 1:1">2</div>
             <div class="thumb placeholder" data-label="Textur-Detail · 1:1">3</div>
             <div class="thumb placeholder" data-label="Anwendung · 1:1">4</div>
@@ -667,7 +688,7 @@
   <section class="product-section">
     <div class="container">
       <div class="product">
-        <div class="product-image placeholder fade-in">Produktbild · 4:5</div>
+        <div class="product-image placeholder has-img fade-in"><img class="product-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTLlbM0TbsD6OqjLMEeLpGJo7RHgswh1WYzvq4cVTqYNTe7JwJOMX7H_X_d2xBYNv0CBoW6WWmeZ-_X_X1iRKHhRlMtoxebpCuxieQb6JiHG_g-1jrgyAUAFg" alt="Bali Curls Bonding Oil" /></div>
         <div class="product-text fade-in">
           <span class="eyebrow" style="text-align:left;">Warum Bali Curls</span>
           <h2>Für feines Haar ist sonst alles zu schwer. Das hier nicht.</h2>
@@ -766,7 +787,7 @@
       <span class="eyebrow">Jetzt bestellen</span>
       <h2 class="section-title fade-in">Bereit für deine besten Haare?</h2>
       <div class="buy-card fade-in">
-        <div class="buy-image placeholder">Produkt · 1:1</div>
+        <div class="buy-image placeholder has-img"><img class="product-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcTLlbM0TbsD6OqjLMEeLpGJo7RHgswh1WYzvq4cVTqYNTe7JwJOMX7H_X_d2xBYNv0CBoW6WWmeZ-_X_X1iRKHhRlMtoxebpCuxieQb6JiHG_g-1jrgyAUAFg" alt="Bali Curls Bonding Oil" /></div>
         <p class="product-name">Bali Curls Bonding Oil – 30 ml</p>
         <p class="price">14,99 €</p>
         <button type="button" class="btn btn-primary btn-large btn-block" id="addToCartBottom">Jetzt kaufen →</button>
@@ -794,12 +815,25 @@
     // Galerie: Thumbnail-Wechsel
     (function () {
       var main = document.getElementById('galleryMain');
+      var mainImg = document.getElementById('galleryImg');
+      var label = document.getElementById('galleryLabel');
       var thumbs = document.querySelectorAll('.thumb');
       thumbs.forEach(function (t) {
         t.addEventListener('click', function () {
           thumbs.forEach(function (x) { x.classList.remove('active'); });
           t.classList.add('active');
-          if (main) main.textContent = t.getAttribute('data-label') || main.textContent;
+          var img = t.getAttribute('data-img');
+          if (img) {
+            // Echtes Foto: anzeigen
+            mainImg.src = img;
+            mainImg.style.display = 'block';
+            main.classList.add('has-img');
+          } else {
+            // Platzhalter-Thumbnail: Label statt Bild zeigen (img bleibt im DOM)
+            mainImg.style.display = 'none';
+            main.classList.remove('has-img');
+            if (label) label.textContent = t.getAttribute('data-label') || '';
+          }
         });
       });
     })();
